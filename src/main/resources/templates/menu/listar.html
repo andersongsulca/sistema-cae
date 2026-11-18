@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Menús Semanales - Sistema CAE</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Título de página -->
+        <h2 class="page-title"><i class="bi bi-calendar-week"></i> Menús Semanales</h2>
+        <p class="page-subtitle">Planifica y gestiona los menús semanales de la institución</p>
+        
+        <!-- Tarjetas de estadísticas rápidas -->
+        <div class="stat-grid">
+            <div class="stat-card tone-primary">
+                <div class="stat-icon"><i class="bi bi-calendar-week"></i></div>
+                <div class="stat-label">Total Menús</div>
+                <div class="stat-value" th:text="${#lists.size(menus)}">0</div>
+            </div>
+            <div class="stat-card tone-success">
+                <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+                <div class="stat-label">Este Mes</div>
+                <div class="stat-value" th:text="${#lists.size(menus.?[#temporals.format(semanaInicio, 'yyyy-MM') == #temporals.format(#temporals.createNow(), 'yyyy-MM')])}">0</div>
+            </div>
+            <div class="stat-card tone-info">
+                <div class="stat-icon"><i class="bi bi-calendar-event"></i></div>
+                <div class="stat-label">Este Año</div>
+                <div class="stat-value" th:text="${#lists.size(menus.?[#temporals.format(semanaInicio, 'yyyy') == #temporals.format(#temporals.createNow(), 'yyyy')])}">0</div>
+            </div>
+            <div class="stat-card tone-warning">
+                <div class="stat-icon"><i class="bi bi-clock-history"></i></div>
+                <div class="stat-label">Más Reciente</div>
+                <div class="stat-value" style="font-size: 1.3rem;" th:if="${#lists.size(menus) > 0}">
+                    <span th:text="${#temporals.format(menus[0].semanaInicio, 'dd/MM')}">--</span>
+                </div>
+                <div class="stat-value" style="font-size: 1.3rem;" th:if="${#lists.size(menus) == 0}">--</div>
+            </div>
+        </div>
+        
+        <!-- Panel principal -->
+        <div class="panel">
+            <div class="panel-head tone-primary">
+                <i class="bi bi-list-ul"></i>
+                <span>Listado de Menús Semanales</span>
+                <a href="/menu/nuevo" class="btn-cae ms-auto">
+                    <i class="bi bi-plus-circle"></i> Nuevo Menú
+                </a>
+            </div>
+            <div class="panel-body">
+                <!-- Barra de búsqueda -->
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" id="buscarMenu" class="form-control" 
+                               placeholder="Buscar por fecha u observaciones...">
+                    </div>
+                </div>
+                
+                <!-- Tabla de menús -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="tablaMenus">
+                        <thead>
+                            <tr>
+                                <th class="text-center"><i class="bi bi-hash me-1"></i>ID</th>
+                                <th><i class="bi bi-calendar-event me-1"></i>Inicio de Semana</th>
+                                <th><i class="bi bi-calendar-event-fill me-1"></i>Fin de Semana</th>
+                                <th><i class="bi bi-card-text me-1"></i>Observaciones</th>
+                                <th class="text-center"><i class="bi bi-gear me-1"></i>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="m : ${menus}">
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark border" th:text="'#' + ${m.id}">#1</span>
+                                </td>
+                                <td>
+                                    <i class="bi bi-play-circle text-success me-1"></i>
+                                    <strong th:text="${#temporals.format(m.semanaInicio, 'dd/MM/yyyy')}">01/01/2024</strong>
+                                </td>
+                                <td>
+                                    <i class="bi bi-stop-circle text-danger me-1"></i>
+                                    <strong th:text="${#temporals.format(m.semanaFin, 'dd/MM/yyyy')}">07/01/2024</strong>
+                                </td>
+                                <td>
+                                    <span th:if="${m.observaciones != null and m.observaciones != ''}" 
+                                          th:text="${m.observaciones}" class="text-muted">-</span>
+                                    <span th:unless="${m.observaciones != null and m.observaciones != ''}" 
+                                          class="text-muted">-</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <a th:href="@{/menu/{id}(id=${m.id})}" 
+                                           class="btn btn-outline-primary" 
+                                           title="Ver detalle"
+                                           data-bs-toggle="tooltip">
+                                            <i class="bi bi-eye me-1"></i>Ver
+                                        </a>
+                                        <form th:action="@{/menu/eliminar/{id}(id=${m.id})}" method="post" 
+                                              class="d-inline" 
+                                              onsubmit="return confirm('¿Estás seguro de eliminar este menú? Esta acción no se puede deshacer.')">
+                                            <button type="submit" class="btn btn-outline-danger" 
+                                                    title="Eliminar menú"
+                                                    data-bs-toggle="tooltip">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(menus)}">
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <i class="bi bi-calendar-x" style="font-size: 3rem;"></i>
+                                    <p class="mt-2 mb-0">No hay menús registrados</p>
+                                    <small>Haz clic en "Nuevo Menú" para crear el primero</small>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-note">
+            <i class="bi bi-info-circle me-1"></i>
+            Los menús semanales ayudan a planificar la alimentación de los estudiantes
+        </div>
+    </div>
+    
+    <script>
+        // Búsqueda en tabla
+        document.getElementById('buscarMenu').addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#tablaMenus tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

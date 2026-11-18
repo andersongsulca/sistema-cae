@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Productos - Sistema CAE</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Título de página -->
+        <h2 class="page-title"><i class="bi bi-box-seam"></i> Gestión de Productos</h2>
+        <p class="page-subtitle">Administra el inventario de productos del sistema CAE</p>
+        
+        <!-- Tarjetas de estadísticas rápidas -->
+        <div class="stat-grid">
+            <div class="stat-card tone-primary">
+                <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+                <div class="stat-label">Total Productos</div>
+                <div class="stat-value" th:text="${#lists.size(productos)}">0</div>
+            </div>
+            <div class="stat-card tone-success">
+                <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+                <div class="stat-label">Activos</div>
+                <div class="stat-value" th:text="${#lists.size(productos.?[estado.name() == 'ACTIVO'])}">0</div>
+            </div>
+            <div class="stat-card tone-warning">
+                <div class="stat-icon"><i class="bi bi-exclamation-triangle"></i></div>
+                <div class="stat-label">Stock Bajo</div>
+                <div class="stat-value" th:text="${#lists.size(productos.?[stockActual <= stockMinimo])}">0</div>
+            </div>
+            <div class="stat-card tone-danger">
+                <div class="stat-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="stat-label">Agotados</div>
+                <div class="stat-value" th:text="${#lists.size(productos.?[stockActual == 0])}">0</div>
+            </div>
+        </div>
+        
+        <!-- Panel principal -->
+        <div class="panel">
+            <div class="panel-head tone-primary">
+                <i class="bi bi-list-ul"></i>
+                <span>Listado de Productos</span>
+                <a href="/productos/nuevo" class="btn-cae ms-auto">
+                    <i class="bi bi-plus-circle"></i> Nuevo Producto
+                </a>
+            </div>
+            <div class="panel-body">
+                <!-- Barra de búsqueda -->
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" id="buscarProducto" class="form-control" 
+                               placeholder="Buscar por código, nombre o categoría...">
+                    </div>
+                </div>
+                
+                <!-- Tabla de productos -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="tablaProductos">
+                        <thead>
+                            <tr>
+                                <th><i class="bi bi-upc-scan me-1"></i>Código</th>
+                                <th><i class="bi bi-tag me-1"></i>Nombre</th>
+                                <th><i class="bi bi-folder me-1"></i>Categoría</th>
+                                <th class="text-center"><i class="bi bi-box me-1"></i>Stock Actual</th>
+                                <th class="text-center"><i class="bi bi-exclamation-circle me-1"></i>Stock Mín.</th>
+                                <th class="text-center"><i class="bi bi-activity me-1"></i>Estado</th>
+                                <th class="text-center"><i class="bi bi-gear me-1"></i>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${productos}" 
+                                th:classappend="${p.stockActual <= p.stockMinimo} ? 'table-warning' : ''">
+                                <td>
+                                    <code class="text-primary fw-bold" th:text="${p.codigo}">001</code>
+                                </td>
+                                <td>
+                                    <strong th:text="${p.nombre}">Producto</strong>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border" th:text="${p.categoria ?: 'Sin categoría'}">Categoría</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge rounded-pill" 
+                                          th:classappend="${p.stockActual == 0} ? 'bg-danger' : (${p.stockActual <= p.stockMinimo} ? 'bg-warning text-dark' : 'bg-success')"
+                                          th:text="${p.stockActual}">0</span>
+                                </td>
+                                <td class="text-center text-muted" th:text="${p.stockMinimo}">0</td>
+                                <td class="text-center">
+                                    <span class="badge rounded-pill" 
+                                          th:classappend="${p.estado.name() == 'ACTIVO'} ? 'bg-success' : 'bg-secondary'" 
+                                          th:text="${p.estado}">ACTIVO</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <a th:href="@{/productos/editar/{id}(id=${p.id})}" 
+                                           class="btn btn-outline-primary" 
+                                           title="Editar producto"
+                                           data-bs-toggle="tooltip">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <form th:action="@{/productos/eliminar/{id}(id=${p.id})}" 
+                                              method="post" class="d-inline" 
+                                              onsubmit="return confirm('¿Estás seguro de eliminar este producto?')">
+                                            <button type="submit" class="btn btn-outline-danger" title="Eliminar producto">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(productos)}">
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                                    <p class="mt-2 mb-0">No hay productos registrados</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-note">
+            <i class="bi bi-info-circle me-1"></i>
+            Los productos con stock bajo se muestran resaltados en amarillo
+        </div>
+    </div>
+    
+    <script>
+        // Búsqueda en tabla
+        document.getElementById('buscarProducto').addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#tablaProductos tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

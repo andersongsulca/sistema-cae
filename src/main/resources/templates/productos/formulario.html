@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Producto Formulario - Sistema CAE</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Título de página -->
+        <h2 class="page-title">
+            <i class="bi bi-box-seam"></i>
+            <span th:text="${producto.id != null} ? 'Editar Producto' : 'Nuevo Producto'">Producto</span>
+        </h2>
+        <p class="page-subtitle" th:text="${producto.id != null} ? 'Modifica los datos del producto seleccionado' : 'Completa el formulario para registrar un nuevo producto'">
+            Completa el formulario
+        </p>
+        
+        <!-- Panel del formulario -->
+        <div class="panel">
+            <div class="panel-head tone-primary">
+                <i class="bi bi-pencil-square"></i>
+                <span th:text="${producto.id != null} ? 'Editar Producto' : 'Nuevo Producto'">Producto</span>
+            </div>
+            <div class="panel-body">
+                <form th:action="${producto.id != null} ? @{/productos/actualizar/{id}(id=${producto.id})} : @{/productos/guardar}" 
+                      th:object="${producto}" method="post">
+                    
+                    <!-- Sección: Información Básica -->
+                    <div class="mb-4">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">
+                            <i class="bi bi-info-circle me-1"></i>Información Básica
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-upc-scan me-1 text-primary"></i>Código *
+                                </label>
+                                <input type="text" th:field="*{codigo}" class="form-control" 
+                                       placeholder="Ej: PROD001" required>
+                                <small class="text-muted">Código único del producto</small>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-tag me-1 text-primary"></i>Nombre *
+                                </label>
+                                <input type="text" th:field="*{nombre}" class="form-control" 
+                                       placeholder="Ej: Arroz Costeño 5kg" required>
+                                <small class="text-muted">Nombre descriptivo del producto</small>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-card-text me-1 text-primary"></i>Descripción
+                                </label>
+                                <textarea th:field="*{descripcion}" class="form-control" rows="3"
+                                          placeholder="Detalles adicionales del producto..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <!-- Sección: Clasificación -->
+                    <div class="mb-4">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">
+                            <i class="bi bi-folder me-1"></i>Clasificación
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-folder2 me-1 text-primary"></i>Categoría
+                                </label>
+                                <input type="text" th:field="*{categoria}" class="form-control" 
+                                       placeholder="Ej: Abarrotes, Limpieza, etc.">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-rulers me-1 text-primary"></i>Unidad de Medida
+                                </label>
+                                <select th:field="*{unidadMedida}" class="form-select">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="kg">Kilogramo (kg)</option>
+                                    <option value="lt">Litro (lt)</option>
+                                    <option value="unidad">Unidad</option>
+                                    <option value="caja">Caja</option>
+                                    <option value="bolsa">Bolsa</option>
+                                    <option value="paquete">Paquete</option>
+                                    <option value="docena">Docena</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <!-- Sección: Inventario -->
+                    <div class="mb-4">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">
+                            <i class="bi bi-box me-1"></i>Control de Inventario
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-exclamation-circle me-1 text-warning"></i>Stock Mínimo *
+                                </label>
+                                <input type="number" step="0.01" min="0" th:field="*{stockMinimo}" 
+                                       class="form-control" required>
+                                <small class="text-muted">Cantidad mínima antes de generar alerta</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-activity me-1 text-success"></i>Estado
+                                </label>
+                                <select th:field="*{estado}" class="form-select">
+                                    <option th:each="e : ${estados}" th:value="${e}" th:text="${e}">ACTIVO</option>
+                                </select>
+                                <small class="text-muted">Estado actual del producto en el sistema</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botones de acción -->
+                    <div class="d-flex gap-2 pt-3 border-top">
+                        <button type="submit" class="btn-cae">
+                            <i class="bi bi-save"></i>
+                            <span th:text="${producto.id != null} ? 'Actualizar' : 'Guardar'">Guardar</span>
+                        </button>
+                        <a href="/productos" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="footer-note">
+            <i class="bi bi-info-circle me-1"></i>
+            Los campos marcados con * son obligatorios
+        </div>
+    </div>
+</body>
+</html>

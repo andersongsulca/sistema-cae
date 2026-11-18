@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Solicitudes de Insumos - Sistema CAE</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Título de página -->
+        <h2 class="page-title"><i class="bi bi-card-checklist"></i> Solicitudes de Insumos</h2>
+        <p class="page-subtitle">Gestiona las solicitudes de productos enviadas por la cocina</p>
+        
+        <!-- Tarjetas de estadísticas rápidas -->
+        <div class="stat-grid">
+            <div class="stat-card tone-primary">
+                <div class="stat-icon"><i class="bi bi-card-checklist"></i></div>
+                <div class="stat-label">Total Solicitudes</div>
+                <div class="stat-value" th:text="${#lists.size(solicitudes)}">0</div>
+            </div>
+            <div class="stat-card tone-warning">
+                <div class="stat-icon"><i class="bi bi-clock-history"></i></div>
+                <div class="stat-label">Pendientes</div>
+                <div class="stat-value" th:text="${#lists.size(solicitudes.?[estado.name() == 'PENDIENTE'])}">0</div>
+            </div>
+            <div class="stat-card tone-success">
+                <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+                <div class="stat-label">Aprobadas</div>
+                <div class="stat-value" th:text="${#lists.size(solicitudes.?[estado.name() == 'APROBADA'])}">0</div>
+            </div>
+            <div class="stat-card tone-danger">
+                <div class="stat-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="stat-label">Rechazadas</div>
+                <div class="stat-value" th:text="${#lists.size(solicitudes.?[estado.name() == 'RECHAZADA'])}">0</div>
+            </div>
+        </div>
+        
+        <!-- Panel principal -->
+        <div class="panel">
+            <div class="panel-head tone-primary">
+                <i class="bi bi-list-ul"></i>
+                <span>Listado de Solicitudes</span>
+            </div>
+            <div class="panel-body">
+                <!-- Barra de búsqueda -->
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" id="buscarSolicitud" class="form-control" 
+                               placeholder="Buscar por ID, cocinera o estado...">
+                    </div>
+                </div>
+                
+                <!-- Tabla de solicitudes -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="tablaSolicitudes">
+                        <thead>
+                            <tr>
+                                <th class="text-center"><i class="bi bi-hash me-1"></i>ID</th>
+                                <th><i class="bi bi-calendar3 me-1"></i>Fecha</th>
+                                <th><i class="bi bi-person-circle me-1"></i>Cocinera</th>
+                                <th class="text-center"><i class="bi bi-flag me-1"></i>Prioridad</th>
+                                <th class="text-center"><i class="bi bi-box-seam me-1"></i>Productos</th>
+                                <th class="text-center"><i class="bi bi-activity me-1"></i>Estado</th>
+                                <th class="text-center"><i class="bi bi-gear me-1"></i>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="solicitud : ${solicitudes}">
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark border" th:text="'#' + ${solicitud.id}">#1</span>
+                                </td>
+                                <td>
+                                    <i class="bi bi-calendar3 text-primary me-1"></i>
+                                    <span th:text="${#temporals.format(solicitud.fechaSolicitud, 'dd/MM/yyyy')}">01/01/2024</span>
+                                </td>
+                                <td>
+                                    <div th:if="${solicitud.usuario != null}">
+                                        <i class="bi bi-person-circle text-primary me-1"></i>
+                                        <strong th:text="${solicitud.usuario.nombre + ' ' + solicitud.usuario.apellido}">Cocinera</strong>
+                                    </div>
+                                    <div th:unless="${solicitud.usuario != null}">
+                                        <span class="text-muted"><i class="bi bi-dash"></i> No disponible</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span th:class="${'badge rounded-pill ' + 
+                                        (solicitud.prioridad == 'URGENTE' ? 'bg-danger' : 
+                                        (solicitud.prioridad == 'ALTA' ? 'bg-warning text-dark' : 'bg-info'))}"
+                                        th:text="${solicitud.prioridad}">NORMAL</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark border" 
+                                          th:text="${#lists.size(solicitud.detalles)} + ' productos'">0 productos</span>
+                                </td>
+                                <td class="text-center">
+                                    <span th:class="${'badge rounded-pill ' + 
+                                        (solicitud.estado.name() == 'APROBADA' ? 'bg-success' : 
+                                        (solicitud.estado.name() == 'RECHAZADA' ? 'bg-danger' : 
+                                        (solicitud.estado.name() == 'ATENDIDA' ? 'bg-primary' : 'bg-warning text-dark')))}"
+                                        th:text="${solicitud.estado.name()}">PENDIENTE</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <!-- Botón Ver Detalle -->
+                                        <a th:href="@{/solicitudes/{id}/ver(id=${solicitud.id})}" 
+                                           class="btn btn-outline-info" 
+                                           title="Ver detalle"
+                                           data-bs-toggle="tooltip">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        
+                                        <!-- Botones de Aprobación (solo si está pendiente) -->
+                                        <th:block th:if="${solicitud.estado.name() == 'PENDIENTE'}">
+                                            <form th:action="@{/solicitudes/aprobar/{id}(id=${solicitud.id})}" 
+                                                  method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-success" 
+                                                        title="Aprobar solicitud"
+                                                        onclick="return confirm('¿Aprobar esta solicitud?')">
+                                                    <i class="bi bi-check-circle"></i>
+                                                </button>
+                                            </form>
+                                            
+                                            <form th:action="@{/solicitudes/rechazar/{id}(id=${solicitud.id})}" 
+                                                  method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-danger" 
+                                                        title="Rechazar solicitud"
+                                                        onclick="return confirm('¿Rechazar esta solicitud?')">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            </form>
+                                        </th:block>
+                                        
+                                        <!-- Mensaje si ya fue atendida -->
+                                        <span th:if="${solicitud.estado.name() != 'PENDIENTE'}" 
+                                              class="badge bg-light text-muted border">
+                                            <i class="bi bi-check2-all"></i> Atendida
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(solicitudes)}">
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                                    <p class="mt-2 mb-0">No hay solicitudes registradas</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-note">
+            <i class="bi bi-info-circle me-1"></i>
+            Las solicitudes pendientes requieren aprobación de la secretaria o directora
+        </div>
+    </div>
+    
+    <script>
+        // Búsqueda en tabla
+        document.getElementById('buscarSolicitud').addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#tablaSolicitudes tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title layout:title-pattern="$CONTENT_TITLE - Sistema CAE">Sistema CAE</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<div class="cae-shell">
+
+    <!-- ===================== Menú lateral ===================== -->
+    <aside class="cae-sidebar">
+        <div class="cae-brand">
+            <img th:src="@{/imagen/logo.png}" src="/imagen/logo.png" alt="Logo I.E. Inicial 11 de Junio" class="cae-brand-logo">
+            <div class="cae-brand-text">
+                <strong>Sistema CAE</strong>
+                <span>I.E. Inicial "11 de Junio"</span>
+            </div>
+        </div>
+
+        <nav class="cae-nav">
+            <div class="cae-nav-group">
+                <div class="cae-nav-label">Menú principal</div>
+                <a href="/home" th:href="@{/home}"><i class="bi bi-house-door"></i>Inicio</a>
+            </div>
+
+            <div class="cae-nav-group" sec:authorize="hasAuthority('ROLE_DIRECTORA')">
+                <div class="cae-nav-label">Directora</div>
+                <a href="/dashboard" th:href="@{/dashboard}"><i class="bi bi-speedometer2"></i>Dashboard</a>
+                <a href="/inventario" th:href="@{/inventario}"><i class="bi bi-archive"></i>Inventario</a>
+                <a href="/reportes" th:href="@{/reportes}"><i class="bi bi-file-earmark-text"></i>Reportes</a>
+                <a href="/usuarios" th:href="@{/usuarios}"><i class="bi bi-people"></i>Usuarios</a>
+                <a href="/auditoria" th:href="@{/auditoria}"><i class="bi bi-shield-check"></i>Auditoría</a>
+                <a href="/respaldos" th:href="@{/respaldos}"><i class="bi bi-cloud-arrow-down"></i>Respaldos</a>
+            </div>
+
+            <div class="cae-nav-group" sec:authorize="hasAuthority('ROLE_SECRETARIA')">
+                <div class="cae-nav-label">Secretaría</div>
+                <a href="/productos" th:href="@{/productos}"><i class="bi bi-box-seam"></i>Productos</a>
+                <a href="/proveedores" th:href="@{/proveedores}"><i class="bi bi-building"></i>Proveedores</a>
+                <a href="/recepciones" th:href="@{/recepciones}"><i class="bi bi-inbox"></i>Recepciones</a>
+                <a href="/inventario" th:href="@{/inventario}"><i class="bi bi-archive"></i>Inventario</a>
+                <a href="/solicitudes" th:href="@{/solicitudes}"><i class="bi bi-clipboard-check"></i>Solicitudes</a>
+                <a href="/salidas" th:href="@{/salidas}"><i class="bi bi-box-arrow-up"></i>Salidas</a>
+                <a href="/alertas" th:href="@{/alertas}"><i class="bi bi-bell"></i>Alertas</a>
+                <a href="/reportes" th:href="@{/reportes}"><i class="bi bi-file-earmark-text"></i>Reportes</a>
+            </div>
+
+            <div class="cae-nav-group" sec:authorize="hasAuthority('ROLE_COCINERA')">
+                <div class="cae-nav-label">Cocina</div>
+                <a href="/menu" th:href="@{/menu}"><i class="bi bi-calendar-week"></i>Menú semanal</a>
+                <a href="/solicitudes/nueva" th:href="@{/solicitudes/nueva}"><i class="bi bi-file-earmark-plus"></i>Solicitar Insumos</a>
+                <a href="/solicitudes/mis-solicitudes" th:href="@{/solicitudes/mis-solicitudes}"><i class="bi bi-eye"></i>Mis Solicitudes</a>
+                <a href="/inventario" th:href="@{/inventario}"><i class="bi bi-archive"></i>Inventario</a>
+            </div>
+        </nav>
+
+        <div class="cae-sidebar-foot">
+            <div class="cae-zigzag" aria-hidden="true"></div>
+            <small>Copacabana · Ayacucho, Perú</small>
+        </div>
+    </aside>
+
+    <!-- ===================== Contenido ===================== -->
+    <div class="cae-main">
+        <header class="cae-topbar">
+            <div class="cae-user">
+                <div class="cae-user-avatar"><i class="bi bi-person-fill"></i></div>
+                <span sec:authentication="name">usuario</span>
+
+                <!-- Insignia de rol en español, SIN corchetes ni "ROLE_" -->
+                <span class="cae-role-badge" sec:authorize="hasAuthority('ROLE_DIRECTORA')">Directora</span>
+                <span class="cae-role-badge" sec:authorize="hasAuthority('ROLE_SECRETARIA')">Secretaria</span>
+                <span class="cae-role-badge" sec:authorize="hasAuthority('ROLE_COCINERA')">Cocinera</span>
+            </div>
+            
+            <!-- ✅ Botón de salir con formulario POST -->
+            <form th:action="@{/logout}" method="post" class="d-inline">
+                <button type="submit" class="cae-logout">
+                    <i class="bi bi-box-arrow-right"></i>Salir
+                </button>
+            </form>
+        </header>
+
+        <main class="cae-content" layout:fragment="content">
+            <!-- El contenido de cada página se inyecta aquí -->
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

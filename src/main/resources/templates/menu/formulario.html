@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Registrar Menú Semanal - Sistema CAE</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Título de página -->
+        <h2 class="page-title"><i class="bi bi-calendar-week"></i> Registrar Menú Semanal</h2>
+        <p class="page-subtitle">Planifica el menú de la semana para los estudiantes</p>
+        
+        <!-- Panel del formulario -->
+        <div class="panel">
+            <div class="panel-head tone-primary">
+                <i class="bi bi-calendar-plus"></i>
+                <span>Nuevo Menú Semanal</span>
+            </div>
+            <div class="panel-body">
+                <form th:action="@{/menu/guardar}" method="post" id="formMenu">
+                    
+                    <!-- Sección: Información General -->
+                    <div class="mb-4">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">
+                            <i class="bi bi-info-circle me-1"></i>Información General
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-play-circle me-1 text-success"></i>Inicio de Semana *
+                                </label>
+                                <input type="date" name="semanaInicio" class="form-control" required>
+                                <small class="text-muted">Fecha de inicio del menú (generalmente lunes)</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-stop-circle me-1 text-danger"></i>Fin de Semana *
+                                </label>
+                                <input type="date" name="semanaFin" class="form-control" required>
+                                <small class="text-muted">Fecha de finalización (generalmente viernes)</small>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-card-text me-1 text-primary"></i>Observaciones
+                                </label>
+                                <textarea name="observaciones" class="form-control" rows="2"
+                                          placeholder="Notas adicionales sobre el menú de la semana..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <!-- Sección: Menú por días -->
+                    <div class="mb-4">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">
+                            <i class="bi bi-calendar3 me-1"></i>Menú por Días (Lunes a Viernes)
+                        </h6>
+                        
+                        <div class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle me-1"></i>
+                            <strong>Consejo:</strong> Planifica un menú variado y nutritivo para los estudiantes. 
+                            Incluye desayuno, almuerzo y merienda para cada día.
+                        </div>
+                        
+                        <div class="accordion" id="accordionMenu">
+                            <!-- Lunes -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#lunes">
+                                        <i class="bi bi-1-circle-fill text-primary me-2"></i>
+                                        <strong>Lunes</strong>
+                                    </button>
+                                </h2>
+                                <div id="lunes" class="accordion-collapse collapse show" data-bs-parent="#accordionMenu">
+                                    <div class="accordion-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold">
+                                                    <i class="bi bi-sunrise text-warning me-1"></i>Desayuno
+                                                </label>
+                                                <input type="text" name="lunesDesayuno" class="form-control" 
+                                                       placeholder="Ej: Avena con leche">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold">
+                                                    <i class="bi bi-sun text-warning me-1"></i>Almuerzo
+                                                </label>
+                                                <input type="text" name="lunesAlmuerzo" class="form-control" 
+                                                       placeholder="Ej: Arroz con pollo">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold">
+                                                    <i class="bi bi-cup-hot text-info me-1"></i>Merienda
+                                                </label>
+                                                <input type="text" name="lunesMerienda" class="form-control" 
+                                                       placeholder="Ej: Fruta">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Martes -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#martes">
+                                        <i class="bi bi-2-circle-fill text-success me-2"></i>
+                                        <strong>Martes</strong>
+                                    </button>
+                                </h2>
+                                <div id="martes" class="accordion-collapse collapse" data-bs-parent="#accordionMenu">
+                                    <div class="accordion-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold">
+                                                    <i class="bi bi-sunrise text-warning me-1"></i>Desayuno
+                                                </label>
+                                                <input type="text" name="martesDesayuno" class="form-control" 
+                                                       placeholder="Ej: Pan con huevo">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold">
+                                                    <i class="bi bi-sun text-warning me-1"></i>Almuerzo
+                                                </label>
+                                                <input type="text" name="martesAlmuerzo" class="form-control" 
+                                                       placeholder="Ej: Tallarines">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold">
+                                                    <i class="bi bi-cup-hot text-info me-1"></i>Merienda
+                                                </label>
+                                                <input type="text" name="martesMerienda" class="form-control" 
+                                                       placeholder="Ej: Yogurt">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Miércoles -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#miercoles">
+                                        <i class="bi bi-3-circle-fill text-info me-2"></i>
+                                        <strong>Miércoles</strong>
+                                    </button>
+                                </h2>
+                                <div id="miercoles" class="accordion-collapse collapse" data-bs-parent="#accordionMenu">
+                                    <div class="accordion-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold">
+                                                    <i class="bi bi-sunrise text-warning me-1"></i>Desayuno
+                                                </label>
+                                                <input type="text" name="miercolesDesayuno" class="form-control" 
+                                                       placeholder="Ej: Quinua con leche">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold">
+                                                    <i class="bi bi-sun text-warning me-1"></i>Almuerzo
+                                                </label>
+                                                <input type="text" name="miercolesAlmuerzo" class="form-control" 
+                                                       placeholder="Ej: Sopa de pollo">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold">
+                                                    <i class="bi bi-cup-hot text-info me-1"></i>Merienda
+                                                </label>
+                                                <input type="text" name="miercolesMerienda" class="form-control" 
+                                                       placeholder="Ej: Galletas">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Jueves -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#jueves">
+                                        <i class="bi bi-4-circle-fill text-warning me-2"></i>
+                                        <strong>Jueves</strong>
+                                    </button>
+                                </h2>
+                                <div id="jueves" class="accordion-collapse collapse" data-bs-parent="#accordionMenu">
+                                    <div class="accordion-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold">
+                                                    <i class="bi bi-sunrise text-warning me-1"></i>Desayuno
+                                                </label>
+                                                <input type="text" name="juevesDesayuno" class="form-control" 
+                                                       placeholder="Ej: Cereal con leche">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold">
+                                                    <i class="bi bi-sun text-warning me-1"></i>Almuerzo
+                                                </label>
+                                                <input type="text" name="juevesAlmuerzo" class="form-control" 
+                                                       placeholder="Ej: Lentejas con arroz">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold">
+                                                    <i class="bi bi-cup-hot text-info me-1"></i>Merienda
+                                                </label>
+                                                <input type="text" name="juevesMerienda" class="form-control" 
+                                                       placeholder="Ej: Pan con mermelada">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Viernes -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#viernes">
+                                        <i class="bi bi-5-circle-fill text-danger me-2"></i>
+                                        <strong>Viernes</strong>
+                                    </button>
+                                </h2>
+                                <div id="viernes" class="accordion-collapse collapse" data-bs-parent="#accordionMenu">
+                                    <div class="accordion-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold">
+                                                    <i class="bi bi-sunrise text-warning me-1"></i>Desayuno
+                                                </label>
+                                                <input type="text" name="viernesDesayuno" class="form-control" 
+                                                       placeholder="Ej: Tortilla">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold">
+                                                    <i class="bi bi-sun text-warning me-1"></i>Almuerzo
+                                                </label>
+                                                <input type="text" name="viernesAlmuerzo" class="form-control" 
+                                                       placeholder="Ej: Pescado con papas">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold">
+                                                    <i class="bi bi-cup-hot text-info me-1"></i>Merienda
+                                                </label>
+                                                <input type="text" name="viernesMerienda" class="form-control" 
+                                                       placeholder="Ej: Gelatina">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botones de acción -->
+                    <div class="d-flex gap-2 pt-3 border-top">
+                        <button type="submit" class="btn-cae">
+                            <i class="bi bi-save"></i> Guardar Menú
+                        </button>
+                        <a href="/menu" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="footer-note">
+            <i class="bi bi-info-circle me-1"></i>
+            Los campos marcados con * son obligatorios. Puedes editar el menú en cualquier momento.
+        </div>
+    </div>
+</body>
+</html>

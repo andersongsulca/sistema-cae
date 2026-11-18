@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Dashboard</title>
+	<link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div layout:fragment="content">
+        <h2 class="page-title"><i class="bi bi-speedometer2"></i>Dashboard de control</h2>
+        <p class="page-subtitle">Resumen general del Centro de Alimentación Escolar</p>
+
+        <!-- Tarjetas de estadísticas -->
+        <div class="stat-grid">
+            <div class="stat-card tone-primary">
+                <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+                <div class="stat-label">Total productos</div>
+                <div class="stat-value" th:text="${estadisticas.totalProductos}">0</div>
+            </div>
+
+            <div class="stat-card tone-warning">
+                <div class="stat-icon"><i class="bi bi-exclamation-triangle"></i></div>
+                <div class="stat-label">Stock bajo</div>
+                <div class="stat-value" th:text="${estadisticas.productosStockBajo}">0</div>
+            </div>
+
+            <div class="stat-card tone-danger">
+                <div class="stat-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="stat-label">Productos agotados</div>
+                <div class="stat-value" th:text="${estadisticas.productosAgotados}">0</div>
+            </div>
+
+            <div class="stat-card tone-info">
+                <div class="stat-icon"><i class="bi bi-clipboard-check"></i></div>
+                <div class="stat-label">Solicitudes pendientes</div>
+                <div class="stat-value" th:text="${estadisticas.solicitudesPendientes}">0</div>
+            </div>
+        </div>
+
+        <!-- Segunda fila -->
+        <div class="row g-3 mb-4">
+            <div class="col-lg-4">
+                <div class="panel">
+                    <div class="panel-head tone-primary"><i class="bi bi-people"></i>Usuarios del sistema</div>
+                    <div class="panel-body text-center">
+                        <div class="split-stat">
+                            <div class="n" th:text="${estadisticas.totalUsuarios}">0</div>
+                            <div class="l">Usuarios registrados</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="panel">
+                    <div class="panel-head tone-primary"><i class="bi bi-box-seam"></i>Inventario</div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-6 split-stat c-success">
+                                <div class="n" th:text="${inventarioStats.productosConStock}">0</div>
+                                <div class="l">Con stock</div>
+                            </div>
+                            <div class="col-6 split-stat c-danger split-divider">
+                                <div class="n" th:text="${inventarioStats.productosSinStock}">0</div>
+                                <div class="l">Sin stock</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="panel">
+                    <div class="panel-head tone-info"><i class="bi bi-clipboard-data"></i>Solicitudes</div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-6 split-stat c-warning">
+                                <div class="n" th:text="${solicitudesStats.pendientes}">0</div>
+                                <div class="l">Pendientes</div>
+                            </div>
+                            <div class="col-6 split-stat c-success split-divider">
+                                <div class="n" th:text="${solicitudesStats.aprobadas}">0</div>
+                                <div class="l">Aprobadas</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alertas -->
+        <div class="panel">
+            <div class="panel-head tone-danger"><i class="bi bi-bell-fill"></i>Alertas de stock</div>
+            <div class="panel-body">
+                <div th:if="${estadisticas.productosStockBajo > 0}" class="cae-alert tone-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <span><strong th:text="${estadisticas.productosStockBajo}">0</strong> productos con stock bajo</span>
+                </div>
+                <div th:if="${estadisticas.productosAgotados > 0}" class="cae-alert tone-danger">
+                    <i class="bi bi-x-circle"></i>
+                    <span><strong th:text="${estadisticas.productosAgotados}">0</strong> productos agotados</span>
+                </div>
+                <div th:if="${estadisticas.solicitudesPendientes > 0}" class="cae-alert tone-info">
+                    <i class="bi bi-clock"></i>
+                    <span><strong th:text="${estadisticas.solicitudesPendientes}">0</strong> solicitudes pendientes de aprobación</span>
+                </div>
+                <div th:if="${estadisticas.productosStockBajo == 0 && estadisticas.productosAgotados == 0 && estadisticas.solicitudesPendientes == 0}"
+                     class="cae-alert tone-success">
+                    <i class="bi bi-check-circle"></i>
+                    <span>Todo está en orden. No hay alertas pendientes.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

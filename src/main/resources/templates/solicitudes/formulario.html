@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Solicitar Insumos - Sistema CAE</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Título de página -->
+        <h2 class="page-title"><i class="bi bi-file-earmark-plus"></i> Solicitar Insumos</h2>
+        <p class="page-subtitle">Envía una solicitud de productos a la secretaria o directora</p>
+        
+        <!-- Panel del formulario -->
+        <div class="panel">
+            <div class="panel-head tone-primary">
+                <i class="bi bi-send"></i>
+                <span>Nueva Solicitud de Insumos</span>
+            </div>
+            <div class="panel-body">
+                <form th:action="@{/solicitudes/guardar}" method="post" id="formSolicitud">
+                    
+                    <!-- Sección: Información General -->
+                    <div class="mb-4">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">
+                            <i class="bi bi-info-circle me-1"></i>Información General
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-calendar3 me-1 text-primary"></i>Fecha *
+                                </label>
+                                <input type="date" name="fechaSolicitud" class="form-control" required>
+                                <small class="text-muted">Fecha en que se realiza la solicitud</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-flag me-1 text-warning"></i>Prioridad
+                                </label>
+                                <select name="prioridad" class="form-select">
+                                    <option value="NORMAL">🟢 Normal - Entrega estándar</option>
+                                    <option value="ALTA">🟡 Alta - Requiere atención</option>
+                                    <option value="URGENTE">🔴 Urgente - Necesidad inmediata</option>
+                                </select>
+                                <small class="text-muted">Nivel de urgencia de la solicitud</small>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-card-text me-1 text-primary"></i>Observaciones
+                                </label>
+                                <textarea name="observaciones" class="form-control" rows="2"
+                                          placeholder="Motivo de la solicitud, notas adicionales..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <!-- Sección: Productos a Solicitar -->
+                    <div class="mb-4">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">
+                            <i class="bi bi-box-seam me-1"></i>Productos a Solicitar
+                        </h6>
+                        
+                        <div class="table-responsive mb-3">
+                            <table class="table table-bordered align-middle" id="tablaProductos">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 40%;">
+                                            <i class="bi bi-box me-1"></i>Producto *
+                                        </th>
+                                        <th style="width: 20%;">
+                                            <i class="bi bi-hash me-1"></i>Cantidad *
+                                        </th>
+                                        <th style="width: 25%;">
+                                            <i class="bi bi-rulers me-1"></i>Unidad
+                                        </th>
+                                        <th style="width: 15%;" class="text-center">
+                                            <i class="bi bi-gear me-1"></i>Acción
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyProductos">
+                                    <tr class="producto-row">
+                                        <td>
+                                            <select name="productoIds" class="form-select producto-select" required>
+                                                <option value="">Seleccione un producto...</option>
+                                                <option th:each="prod : ${productos}" 
+                                                        th:value="${prod.id}" 
+                                                        th:text="${prod.nombre + ' - Stock: ' + prod.stockActual + ' ' + prod.unidadMedida}">Producto</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="number" name="cantidades" 
+                                                   class="form-control" step="0.01" min="0.01" required
+                                                   placeholder="0.00">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="unidades" 
+                                                   class="form-control" placeholder="kg, lt, unidad">
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                    onclick="eliminarFila(this)" title="Eliminar fila">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <button type="button" class="btn btn-outline-primary" onclick="agregarFila()">
+                            <i class="bi bi-plus-circle me-1"></i>Agregar otro producto
+                        </button>
+                    </div>
+                    
+                    <!-- Botones de acción -->
+                    <div class="d-flex gap-2 pt-3 border-top">
+                        <button type="submit" class="btn-cae">
+                            <i class="bi bi-send"></i> Enviar Solicitud
+                        </button>
+                        <a href="/solicitudes/mis-solicitudes" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="footer-note">
+            <i class="bi bi-info-circle me-1"></i>
+            Los campos marcados con * son obligatorios. La solicitud será enviada para aprobación.
+        </div>
+    </div>
+    
+    <script>
+        function agregarFila() {
+            const tbody = document.getElementById('tbodyProductos');
+            const nuevaFila = document.createElement('tr');
+            nuevaFila.className = 'producto-row';
+            
+            const primerSelect = document.querySelector('.producto-select');
+            const opciones = primerSelect ? primerSelect.innerHTML : '';
+            
+            nuevaFila.innerHTML = `
+                <td>
+                    <select name="productoIds" class="form-select producto-select" required>
+                        <option value="">Seleccione un producto...</option>
+                        ${opciones}
+                    </select>
+                </td>
+                <td>
+                    <input type="number" name="cantidades" 
+                           class="form-control" step="0.01" min="0.01" required
+                           placeholder="0.00">
+                </td>
+                <td>
+                    <input type="text" name="unidades" 
+                           class="form-control" placeholder="kg, lt, unidad">
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-outline-danger btn-sm" 
+                            onclick="eliminarFila(this)" title="Eliminar fila">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            `;
+            
+            tbody.appendChild(nuevaFila);
+        }
+        
+        function eliminarFila(boton) {
+            const fila = boton.closest('tr');
+            const tbody = document.getElementById('tbodyProductos');
+            
+            if (tbody.children.length > 1) {
+                fila.remove();
+            } else {
+                alert('Debe haber al menos un producto');
+            }
+        }
+    </script>
+</body>
+</html>

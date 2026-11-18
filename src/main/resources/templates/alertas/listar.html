@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Centro de Alertas - Sistema CAE</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Título de página -->
+        <h2 class="page-title"><i class="bi bi-bell"></i> Centro de Alertas</h2>
+        <p class="page-subtitle">Monitorea las notificaciones y alertas del sistema</p>
+        
+        <!-- Tarjetas de estadísticas rápidas -->
+        <div class="stat-grid">
+            <div class="stat-card tone-primary">
+                <div class="stat-icon"><i class="bi bi-bell"></i></div>
+                <div class="stat-label">Total Alertas</div>
+                <div class="stat-value" th:text="${#lists.size(alertas)}">0</div>
+            </div>
+            <div class="stat-card tone-warning">
+                <div class="stat-icon"><i class="bi bi-bell-fill"></i></div>
+                <div class="stat-label">No Leídas</div>
+                <div class="stat-value" th:text="${#lists.size(alertas.?[leida == false])}">0</div>
+            </div>
+            <div class="stat-card tone-danger">
+                <div class="stat-icon"><i class="bi bi-exclamation-triangle"></i></div>
+                <div class="stat-label">Stock Crítico</div>
+                <div class="stat-value" th:text="${#lists.size(alertas.?[tipo.name() == 'STOCK_BAJO' or tipo.name() == 'PRODUCTO_AGOTADO'])}">0</div>
+            </div>
+            <div class="stat-card tone-info">
+                <div class="stat-icon"><i class="bi bi-clipboard-check"></i></div>
+                <div class="stat-label">Solicitudes</div>
+                <div class="stat-value" th:text="${#lists.size(alertas.?[tipo.name() == 'SOLICITUD_PENDIENTE'])}">0</div>
+            </div>
+        </div>
+        
+        <!-- Panel principal -->
+        <div class="panel">
+            <div class="panel-head tone-primary">
+                <i class="bi bi-list-ul"></i>
+                <span>Listado de Alertas</span>
+                <div th:if="${#lists.size(alertas) > 0}" class="ms-auto">
+                    <form th:action="@{/alertas/eliminar-todas}" method="post" class="d-inline"
+                          onsubmit="return confirm('¿Eliminar todas las alertas? Esta acción no se puede deshacer.')">
+                        <button type="submit" class="btn btn-sm btn-light">
+                            <i class="bi bi-trash me-1"></i>Eliminar todas
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="panel-body">
+                <!-- Estado vacío -->
+                <div th:if="${#lists.isEmpty(alertas)}" class="text-center py-5">
+                    <i class="bi bi-bell-slash text-muted" style="font-size: 4rem;"></i>
+                    <h5 class="text-muted mt-3">No hay alertas</h5>
+                    <p class="text-muted mb-0">Todo está en orden. No hay alertas registradas en el sistema.</p>
+                </div>
+                
+                <!-- Tabla de alertas -->
+                <div th:unless="${#lists.isEmpty(alertas)}" class="table-responsive">
+                    <table class="table table-hover align-middle" id="tablaAlertas">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;" class="text-center">
+                                    <i class="bi bi-bell-fill"></i>
+                                </th>
+                                <th><i class="bi bi-calendar3 me-1"></i>Fecha</th>
+                                <th class="text-center"><i class="bi bi-tag me-1"></i>Tipo</th>
+                                <th><i class="bi bi-chat-text me-1"></i>Mensaje</th>
+                                <th class="text-center"><i class="bi bi-eye me-1"></i>Estado</th>
+                                <th class="text-center"><i class="bi bi-gear me-1"></i>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="alerta : ${alertas}"
+                                th:class="${alerta.leida ? '' : 'table-warning'}">
+                                <td class="text-center">
+                                    <i th:if="${!alerta.leida}" class="bi bi-bell-fill text-warning" style="font-size: 1.3rem;"></i>
+                                    <i th:unless="${!alerta.leida}" class="bi bi-bell text-muted" style="font-size: 1.3rem;"></i>
+                                </td>
+                                <td>
+                                    <small class="text-muted d-block">
+                                        <i class="bi bi-clock me-1"></i>
+                                        <span th:text="${#temporals.format(alerta.fecha, 'dd/MM/yyyy')}">01/01/2024</span>
+                                    </small>
+                                    <strong th:text="${#temporals.format(alerta.fecha, 'HH:mm')}">10:00</strong>
+                                </td>
+                                <td class="text-center">
+                                    <span th:class="${'badge rounded-pill ' + 
+                                        (alerta.tipo.name() == 'STOCK_BAJO' ? 'bg-warning text-dark' :
+                                        alerta.tipo.name() == 'PRODUCTO_AGOTADO' ? 'bg-danger' :
+                                        alerta.tipo.name() == 'VENCIMIENTO_PROXIMO' ? 'bg-info' :
+                                        alerta.tipo.name() == 'SOLICITUD_PENDIENTE' ? 'bg-primary' :
+                                        alerta.tipo.name() == 'ERROR' ? 'bg-danger' : 'bg-secondary')}"
+                                        th:text="${alerta.tipo.name()}">TIPO</span>
+                                </td>
+                                <td>
+                                    <span th:text="${alerta.mensaje}" class="text-break">Mensaje de alerta</span>
+                                </td>
+                                <td class="text-center">
+                                    <span th:if="${alerta.leida}" class="badge rounded-pill bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>Leída
+                                    </span>
+                                    <span th:unless="${alerta.leida}" class="badge rounded-pill bg-warning text-dark">
+                                        <i class="bi bi-clock me-1"></i>No leída
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <form th:if="${!alerta.leida}" 
+                                              th:action="@{/alertas/marcar-leida/{id}(id=${alerta.id})}" 
+                                              method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-success" 
+                                                    title="Marcar como leída"
+                                                    data-bs-toggle="tooltip">
+                                                <i class="bi bi-check-circle"></i>
+                                            </button>
+                                        </form>
+                                        
+                                        <form th:action="@{/alertas/eliminar/{id}(id=${alerta.id})}" 
+                                              method="post" class="d-inline"
+                                              onsubmit="return confirm('¿Eliminar esta alerta?')">
+                                            <button type="submit" class="btn btn-outline-danger" 
+                                                    title="Eliminar alerta"
+                                                    data-bs-toggle="tooltip">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Leyenda de tipos de alerta -->
+        <div class="panel mt-3">
+            <div class="panel-body">
+                <h6 class="text-uppercase text-muted small fw-bold mb-3">
+                    <i class="bi bi-info-circle me-1"></i>Tipos de Alertas
+                </h6>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge rounded-pill bg-warning text-dark">&nbsp;&nbsp;</span>
+                            <small class="text-muted">Stock Bajo</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge rounded-pill bg-danger">&nbsp;&nbsp;</span>
+                            <small class="text-muted">Producto Agotado</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge rounded-pill bg-info">&nbsp;&nbsp;</span>
+                            <small class="text-muted">Vencimiento Próximo</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge rounded-pill bg-primary">&nbsp;&nbsp;</span>
+                            <small class="text-muted">Solicitud Pendiente</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-note">
+            <i class="bi bi-info-circle me-1"></i>
+            Las alertas se generan automáticamente cuando hay stock bajo, productos agotados o nuevas solicitudes
+        </div>
+    </div>
+</body>
+</html>

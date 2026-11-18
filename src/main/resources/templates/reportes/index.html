@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Reportes - Sistema CAE</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Título de página -->
+        <h2 class="page-title"><i class="bi bi-file-earmark-text"></i> Centro de Reportes</h2>
+        <p class="page-subtitle">Genera reportes en PDF del sistema</p>
+        
+        <!-- Tarjetas de reportes disponibles -->
+        <div class="row g-3 mb-4">
+            
+            <!-- Reporte de Inventario -->
+            <div class="col-md-4">
+                <div class="access-card">
+                    <div class="access-icon" style="background: var(--primary-tint); color: var(--primary);">
+                        <i class="bi bi-archive"></i>
+                    </div>
+                    <h5>Reporte de Inventario</h5>
+                    <p>Listado completo de todos los productos con stock actual, mínimo y estado</p>
+                    <a href="/reportes/inventario/pdf" target="_blank" class="btn-cae">
+                        <i class="bi bi-file-pdf me-1"></i> Generar PDF
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Reporte de Movimientos -->
+            <div class="col-md-4">
+                <div class="access-card">
+                    <div class="access-icon" style="background: var(--info-tint); color: var(--info);">
+                        <i class="bi bi-arrow-left-right"></i>
+                    </div>
+                    <h5>Reporte de Movimientos</h5>
+                    <p>Historial de todas las entradas y salidas del inventario</p>
+                    <a href="/reportes/movimientos/pdf" target="_blank" class="btn-cae">
+                        <i class="bi bi-file-pdf me-1"></i> Generar PDF
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Productos Críticos -->
+            <div class="col-md-4">
+                <div class="access-card">
+                    <div class="access-icon" style="background: var(--danger-tint); color: var(--danger);">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <h5>Productos Críticos</h5>
+                    <p>Lista de productos con stock bajo o agotados que requieren atención</p>
+                    <a href="/reportes/criticos/pdf" target="_blank" class="btn-cae">
+                        <i class="bi bi-file-pdf me-1"></i> Generar PDF
+                    </a>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- Panel informativo -->
+        <div class="panel">
+            <div class="panel-head tone-info">
+                <i class="bi bi-info-circle"></i>
+                <span>Información sobre los Reportes</span>
+            </div>
+            <div class="panel-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="bi bi-file-pdf text-danger" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <strong class="d-block">Formato PDF</strong>
+                                <small class="text-muted">Todos los reportes se generan en formato PDF</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="bi bi-clock-history text-primary" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <strong class="d-block">Datos Actualizados</strong>
+                                <small class="text-muted">Los datos se obtienen en tiempo real</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="bi bi-printer text-success" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <strong class="d-block">Listo para Imprimir</strong>
+                                <small class="text-muted">Puedes imprimir o guardar los PDFs</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-note">
+            <i class="bi bi-info-circle me-1"></i>
+            Los reportes se abren en una nueva pestaña del navegador
+        </div>
+    </div>
+</body>
+</html>

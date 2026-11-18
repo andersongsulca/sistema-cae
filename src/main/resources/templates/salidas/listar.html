@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Salidas - Sistema CAE</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <h2 class="page-title"><i class="bi bi-box-arrow-up"></i> Salidas de Insumos</h2>
+        <p class="page-subtitle">Gestiona las salidas de productos del inventario</p>
+        
+        <div class="panel">
+            <div class="panel-head tone-primary">
+                <i class="bi bi-list-ul"></i>
+                <span>Listado de Salidas</span>
+                <a href="/salidas/nueva" class="btn-cae ms-auto">
+                    <i class="bi bi-plus-circle"></i> Nueva Salida
+                </a>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Usuario</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="s : ${salidas}">
+                                <td th:text="${s.id}">1</td>
+                                <td th:text="${#temporals.format(s.fecha, 'dd/MM/yyyy')}">01/01/2024</td>
+                                <td th:text="${s.usuario != null ? s.usuario.nombreCompleto : 'N/A'}">Usuario</td>
+                                <td>
+                                    <a th:href="@{/salidas/{id}(id=${s.id})}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i> Ver
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Recepciones - Sistema CAE</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-inbox"></i> Recepciones de Insumos</h2>
+            <a href="/recepciones/nueva" class="btn btn-success"><i class="bi bi-plus-circle"></i> Nueva Recepción</a>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr><th>ID</th><th>Fecha</th><th>N° Remisión</th><th>Proveedor</th><th>Estado</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="r : ${recepciones}">
+                            <td th:text="${r.id}"></td>
+                            <td th:text="${#temporals.format(r.fecha, 'dd/MM/yyyy')}"></td>
+                            <td th:text="${r.numeroRemision}"></td>
+                            <td th:text="${r.proveedor != null} ? ${r.proveedor.nombre} : 'N/A'"></td>
+                            <td><span class="badge bg-primary" th:text="${r.estado}"></span></td>
+                            <td>
+                                <a th:href="@{/recepciones/{id}(id=${r.id})}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

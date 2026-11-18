@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Detalle de Solicitud - Sistema CAE</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Título de página -->
+        <div class="d-flex justify-content-between align-items-start mb-4">
+            <div>
+                <h2 class="page-title">
+                    <i class="bi bi-card-checklist"></i>
+                    Detalle de Solicitud #<span th:text="${solicitud.id}">1</span>
+                </h2>
+                <p class="page-subtitle">Información completa de la solicitud de insumos</p>
+            </div>
+            <a href="/solicitudes" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Volver
+            </a>
+        </div>
+        
+        <!-- Panel: Información General -->
+        <div class="panel mb-4">
+            <div class="panel-head tone-primary">
+                <i class="bi bi-info-circle"></i>
+                <span>Información General</span>
+            </div>
+            <div class="panel-body">
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-light rounded">
+                            <i class="bi bi-calendar3 text-primary" style="font-size: 2rem;"></i>
+                            <div class="mt-2">
+                                <small class="text-muted d-block text-uppercase small fw-bold">Fecha</small>
+                                <strong class="fs-5" th:text="${#temporals.format(solicitud.fechaSolicitud, 'dd/MM/yyyy')}">--</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-light rounded">
+                            <i class="bi bi-person-circle text-primary" style="font-size: 2rem;"></i>
+                            <div class="mt-2">
+                                <small class="text-muted d-block text-uppercase small fw-bold">Cocinera</small>
+                                <strong class="fs-6" th:text="${solicitud.usuario != null ? solicitud.usuario.nombreCompleto : 'N/A'}">--</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-light rounded">
+                            <i class="bi bi-flag text-warning" style="font-size: 2rem;"></i>
+                            <div class="mt-2">
+                                <small class="text-muted d-block text-uppercase small fw-bold">Prioridad</small>
+                                <span th:class="${'badge rounded-pill fs-6 ' + 
+                                    (solicitud.prioridad == 'URGENTE' ? 'bg-danger' : 
+                                    (solicitud.prioridad == 'ALTA' ? 'bg-warning text-dark' : 'bg-info'))}"
+                                    th:text="${solicitud.prioridad}">NORMAL</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-light rounded">
+                            <i class="bi bi-activity text-success" style="font-size: 2rem;"></i>
+                            <div class="mt-2">
+                                <small class="text-muted d-block text-uppercase small fw-bold">Estado</small>
+                                <span th:class="${'badge rounded-pill fs-6 ' + 
+                                    (solicitud.estado.name() == 'APROBADA' ? 'bg-success' : 
+                                    (solicitud.estado.name() == 'RECHAZADA' ? 'bg-danger' : 
+                                    (solicitud.estado.name() == 'ATENDIDA' ? 'bg-primary' : 'bg-warning text-dark')))}"
+                                    th:text="${solicitud.estado.name()}">PENDIENTE</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" th:if="${solicitud.observaciones}">
+                        <div class="p-3 bg-warning bg-opacity-10 rounded border-start border-4 border-warning">
+                            <small class="text-muted d-block text-uppercase small fw-bold mb-2">
+                                <i class="bi bi-card-text me-1"></i>Observaciones
+                            </small>
+                            <p class="mb-0" th:text="${solicitud.observaciones}">--</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Panel: Productos Solicitados -->
+        <div class="panel mb-4">
+            <div class="panel-head tone-info">
+                <i class="bi bi-box-seam"></i>
+                <span>Productos Solicitados</span>
+                <span class="badge bg-white text-info ms-2" th:text="${#lists.size(solicitud.detalles)}">0</span>
+            </div>
+            <div class="panel-body">
+                <div th:if="${#lists.isEmpty(solicitud.detalles)}" class="text-center py-5">
+                    <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                    <p class="mt-2 text-muted mb-0">No hay productos en esta solicitud</p>
+                </div>
+                
+                <div th:unless="${#lists.isEmpty(solicitud.detalles)}" class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th><i class="bi bi-tag me-1"></i>Producto</th>
+                                <th class="text-center"><i class="bi bi-hash me-1"></i>Cantidad Solicitada</th>
+                                <th><i class="bi bi-rulers me-1"></i>Unidad</th>
+                                <th class="text-center"><i class="bi bi-box me-1"></i>Stock Actual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="detalle : ${solicitud.detalles}">
+                                <td>
+                                    <strong th:text="${detalle.producto.nombre}">Producto</strong>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge rounded-pill bg-primary fs-6" th:text="${detalle.cantidadSolicitada}">0</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border" th:text="${detalle.unidad}">kg</span>
+                                </td>
+                                <td class="text-center">
+                                    <span th:class="${detalle.producto.stockActual < detalle.producto.stockMinimo ? 'text-danger fw-bold' : 'text-success'}"
+                                          th:text="${detalle.producto.stockActual + ' ' + detalle.producto.unidadMedida}">0 kg</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Panel: Acciones (solo si está pendiente) -->
+        <div class="panel" th:if="${solicitud.estado.name() == 'PENDIENTE'}">
+            <div class="panel-head tone-warning">
+                <i class="bi bi-question-circle"></i>
+                <span>¿Qué deseas hacer con esta solicitud?</span>
+            </div>
+            <div class="panel-body text-center py-4">
+                <div class="d-flex justify-content-center gap-3">
+                    <form th:action="@{/solicitudes/aprobar/{id}(id=${solicitud.id})}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-success btn-lg px-4" 
+                                onclick="return confirm('¿Aprobar esta solicitud?')">
+                            <i class="bi bi-check-circle me-2"></i>Aprobar Solicitud
+                        </button>
+                    </form>
+                    <form th:action="@{/solicitudes/rechazar/{id}(id=${solicitud.id})}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-lg px-4" 
+                                onclick="return confirm('¿Rechazar esta solicitud?')">
+                            <i class="bi bi-x-circle me-2"></i>Rechazar Solicitud
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-note">
+            <i class="bi bi-info-circle me-1"></i>
+            Las solicitudes aprobadas serán atendidas por el área correspondiente
+        </div>
+    </div>
+</body>
+</html>

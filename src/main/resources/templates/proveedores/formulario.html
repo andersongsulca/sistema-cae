@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Proveedor - Sistema CAE</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Título de página -->
+        <h2 class="page-title">
+            <i class="bi bi-building"></i>
+            <span th:text="${proveedor.id != null} ? 'Editar Proveedor' : 'Nuevo Proveedor'">Proveedor</span>
+        </h2>
+        <p class="page-subtitle" th:text="${proveedor.id != null} ? 'Modifica los datos del proveedor seleccionado' : 'Completa el formulario para registrar un nuevo proveedor'">
+            Completa el formulario
+        </p>
+        
+        <!-- Panel del formulario -->
+        <div class="panel">
+            <div class="panel-head tone-primary">
+                <i class="bi bi-pencil-square"></i>
+                <span th:text="${proveedor.id != null} ? 'Editar Proveedor' : 'Nuevo Proveedor'">Proveedor</span>
+            </div>
+            <div class="panel-body">
+                <form th:action="${proveedor.id != null} ? @{/proveedores/actualizar/{id}(id=${proveedor.id})} : @{/proveedores/guardar}" 
+                      th:object="${proveedor}" method="post" id="formProveedor">
+                    
+                    <!-- Sección: Información Principal -->
+                    <div class="mb-4">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">
+                            <i class="bi bi-info-circle me-1"></i>Información Principal
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-building me-1 text-primary"></i>Nombre del Proveedor *
+                                </label>
+                                <input type="text" th:field="*{nombre}" class="form-control" 
+                                       minlength="3" maxlength="150" 
+                                       placeholder="Ej: Distribuidora Los Andes S.A.C." required>
+                                <small class="text-muted">Nombre comercial o razón social (3-150 caracteres)</small>
+                                <div class="invalid-feedback">El nombre debe tener entre 3 y 150 caracteres</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-file-earmark-text me-1 text-primary"></i>RUC *
+                                </label>
+                                <input type="text" th:field="*{ruc}" class="form-control" 
+                                       pattern="[0-9]{11}" maxlength="11" 
+                                       placeholder="Ej: 20123456789"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                                <small class="text-muted">11 dígitos numéricos</small>
+                                <div class="invalid-feedback">El RUC debe tener exactamente 11 dígitos numéricos</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <!-- Sección: Información de Contacto -->
+                    <div class="mb-4">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">
+                            <i class="bi bi-telephone me-1"></i>Información de Contacto
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-telephone me-1 text-success"></i>Teléfono
+                                </label>
+                                <input type="text" th:field="*{telefono}" class="form-control"
+                                       pattern="[0-9]{9}" maxlength="9"
+                                       placeholder="Ej: 987654321"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                <small class="text-muted">9 dígitos numéricos (celular o fijo)</small>
+                                <div class="invalid-feedback">El teléfono debe tener exactamente 9 dígitos</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-envelope me-1 text-info"></i>Email
+                                </label>
+                                <input type="email" th:field="*{email}" class="form-control"
+                                       placeholder="contacto@proveedor.com">
+                                <small class="text-muted">Correo electrónico de contacto</small>
+                                <div class="invalid-feedback">Ingrese un email válido</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <!-- Sección: Ubicación -->
+                    <div class="mb-4">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">
+                            <i class="bi bi-geo-alt me-1"></i>Ubicación
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-geo-alt me-1 text-warning"></i>Dirección
+                                </label>
+                                <input type="text" th:field="*{direccion}" class="form-control"
+                                       maxlength="250" placeholder="Ej: Av. Los Andes 123, Lima - Perú">
+                                <small class="text-muted">Dirección completa del proveedor (opcional)</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botones de acción -->
+                    <div class="d-flex gap-2 pt-3 border-top">
+                        <button type="submit" class="btn-cae">
+                            <i class="bi bi-save"></i>
+                            <span th:text="${proveedor.id != null} ? 'Actualizar' : 'Guardar'">Guardar</span>
+                        </button>
+                        <a href="/proveedores" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="footer-note">
+            <i class="bi bi-info-circle me-1"></i>
+            Los campos marcados con * son obligatorios
+        </div>
+    </div>
+    
+    <script>
+        // Validación en tiempo real
+        document.getElementById('formProveedor').addEventListener('submit', function(e) {
+            const form = this;
+            const ruc = form.querySelector('[name="ruc"]');
+            const telefono = form.querySelector('[name="telefono"]');
+            
+            // Validar RUC
+            if (ruc.value && ruc.value.length !== 11) {
+                e.preventDefault();
+                ruc.classList.add('is-invalid');
+                alert('El RUC debe tener exactamente 11 dígitos');
+                return;
+            }
+            
+            // Validar Teléfono
+            if (telefono.value && telefono.value.length !== 9) {
+                e.preventDefault();
+                telefono.classList.add('is-invalid');
+                alert('El teléfono debe tener exactamente 9 dígitos');
+                return;
+            }
+            
+            ruc.classList.remove('is-invalid');
+            telefono.classList.remove('is-invalid');
+        });
+        
+        // Limpiar error al escribir
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+            });
+        });
+    </script>
+</body>
+</html>

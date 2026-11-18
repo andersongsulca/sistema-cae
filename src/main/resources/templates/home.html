@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Inicio - Sistema CAE</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        
+        <!-- Banner de bienvenida mejorado -->
+        <div class="welcome-banner">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2>¡Bienvenido(a) al Sistema CAE!</h2>
+                    <p class="mb-2">Sistema de Gestión Alimentaria Escolar</p>
+                    <p class="mb-0" style="font-size: 0.9rem; opacity: 0.9;">
+                        <i class="bi bi-geo-alt me-1"></i>I.E. Inicial "11 de Junio" — Copacabana, Ayacucho
+                    </p>
+                </div>
+                <div class="col-md-4 text-end d-none d-md-block">
+                    <i class="bi bi-mortarboard" style="font-size: 5rem; opacity: 0.3;"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Acceso rápido según rol -->
+        <h3 class="mb-3" style="color: var(--primary-700);">
+            <i class="bi bi-lightning-charge me-2"></i>Accesos Rápidos
+        </h3>
+        
+        <div class="row g-3 mb-4">
+            <!-- DIRECTORA -->
+            <div class="col-md-4" sec:authorize="hasAuthority('ROLE_DIRECTORA')">
+                <div class="access-card">
+                    <div class="access-icon" style="background: var(--primary-tint); color: var(--primary);">
+                        <i class="bi bi-speedometer2"></i>
+                    </div>
+                    <h5>Dashboard</h5>
+                    <p>Monitoreo general y estadísticas del sistema</p>
+                    <a href="/dashboard" th:href="@{/dashboard}" class="btn-cae">
+                        Ir al dashboard <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4" sec:authorize="hasAuthority('ROLE_DIRECTORA')">
+                <div class="access-card">
+                    <div class="access-icon" style="background: var(--info-tint); color: var(--info);">
+                        <i class="bi bi-archive"></i>
+                    </div>
+                    <h5>Inventario</h5>
+                    <p>Consulta el estado actual del inventario</p>
+                    <a href="/inventario" th:href="@{/inventario}" class="btn-cae">
+                        Ver inventario <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4" sec:authorize="hasAuthority('ROLE_DIRECTORA')">
+                <div class="access-card">
+                    <div class="access-icon" style="background: var(--warning-tint); color: var(--warning);">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h5>Usuarios</h5>
+                    <p>Gestiona los usuarios del sistema</p>
+                    <a href="/usuarios" th:href="@{/usuarios}" class="btn-cae">
+                        Gestionar usuarios <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- SECRETARIA - TODAS LAS OPCIONES -->
+            <div class="col-md-4" sec:authorize="hasAuthority('ROLE_SECRETARIA')">
+                <div class="access-card">
+                    <div class="access-icon" style="background: var(--primary-tint); color: var(--primary);">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                    <h5>Productos</h5>
+                    <p>Gestionar productos del inventario</p>
+                    <a href="/productos" th:href="@{/productos}" class="btn-cae">
+                        Ver productos <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4" sec:authorize="hasAuthority('ROLE_SECRETARIA')">
+                <div class="access-card">
+                    <div class="access-icon" style="background: var(--success-tint); color: var(--success);">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <h5>Proveedores</h5>
+                    <p>Administrar proveedores</p>
+                    <a href="/proveedores" th:href="@{/proveedores}" class="btn-cae">
+                        Ver proveedores <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4" sec:authorize="hasAuthority('ROLE_SECRETARIA')">
+                <div class="access-card">
+                    <div class="access-icon" style="background: var(--success-tint); color: var(--success);">
+                        <i class="bi bi-inbox"></i>
+                    </div>
+                    <h5>Recepciones</h5>
+                    <p>Registrar ingreso de insumos</p>
+                    <a href="/recepciones" th:href="@{/recepciones}" class="btn-cae">
+                        Ver recepciones <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4" sec:authorize="hasAuthority('ROLE_SECRETARIA')">
+                <div class="access-card">
+                    <div class="access-icon" style="background: var(--info-tint); color: var(--info);">
+                        <i class="bi bi-archive"></i>
+                    </div>
+                    <h5>Inventario</h5>
+                    <p>Consultar stock de productos</p>
+                    <a href="/inventario" th:href="@{/inventario}" class="btn-cae">
+                        Ver inventario <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4" sec:authorize="hasAuthority('ROLE_SECRETARIA')">
+                <div class="access-card">
+                    <div class="access-icon" style="background: var(--accent-tint); color: var(--accent);">
+                        <i class="bi bi-clipboard-check"></i>
+                    </div>
+                    <h5>Solicitudes</h5>
+                    <p>Aprobar o rechazar solicitudes</p>
+                    <a href="/solicitudes" th:href="@{/solicitudes}" class="btn-cae">
+                        Ver solicitudes <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4" sec:authorize="hasAuthority('ROLE_SECRETARIA')">
+                <div class="access-card">
+                    <div class="access-icon" style="background: var(--danger-tint); color: var(--danger);">
+                        <i class="bi bi-box-arrow-up"></i>
+                    </div>
+                    <h5>Salidas</h5>
+                    <p>Registrar salida de insumos</p>
+                    <a href="/salidas" th:href="@{/salidas}" class="btn-cae">
+                        Ver salidas <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4" sec:authorize="hasAuthority('ROLE_SECRETARIA')">
+                <div class="access-card">
+                    <div class="access-icon" style="background: var(--warning-tint); color: var(--warning);">
+                        <i class="bi bi-bell"></i>
+                    </div>
+                    <h5>Alertas</h5>
+                    <p>Ver alertas del sistema</p>
+                    <a href="/alertas" th:href="@{/alertas}" class="btn-cae">
+                        Ver alertas <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4" sec:authorize="hasAuthority('ROLE_SECRETARIA')">
+                <div class="access-card">
+                    <div class="access-icon" style="background: var(--info-tint); color: var(--info);">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+                    <h5>Reportes</h5>
+                    <p>Generar reportes y estadísticas</p>
+                    <a href="/reportes" th:href="@{/reportes}" class="btn-cae">
+                        Ver reportes <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- COCINERA -->
+            <div class="col-md-4" sec:authorize="hasAuthority('ROLE_COCINERA')">
+                <div class="access-card">
+                    <div class="access-icon" style="background: var(--warning-tint); color: var(--warning);">
+                        <i class="bi bi-calendar-week"></i>
+                    </div>
+                    <h5>Menú Semanal</h5>
+                    <p>Planificar el menú de la semana</p>
+                    <a href="/menu" th:href="@{/menu}" class="btn-cae">
+                        Ver menús <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4" sec:authorize="hasAuthority('ROLE_COCINERA')">
+                <div class="access-card">
+                    <div class="access-icon" style="background: var(--primary-tint); color: var(--primary);">
+                        <i class="bi bi-file-earmark-plus"></i>
+                    </div>
+                    <h5>Solicitar Insumos</h5>
+                    <p>Solicitar productos para la cocina</p>
+                    <a href="/solicitudes/nueva" th:href="@{/solicitudes/nueva}" class="btn-cae">
+                        Nueva solicitud <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4" sec:authorize="hasAuthority('ROLE_COCINERA')">
+                <div class="access-card">
+                    <div class="access-icon" style="background: var(--info-tint); color: var(--info);">
+                        <i class="bi bi-archive"></i>
+                    </div>
+                    <h5>Mi Inventario</h5>
+                    <p>Consulta el stock disponible</p>
+                    <a href="/inventario" th:href="@{/inventario}" class="btn-cae">
+                        Ver inventario <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            <i class="bi bi-shield-check me-1"></i>
+            © 2026 Sistema CAE · I.E. Inicial "11 de Junio", Copacabana. Todos los derechos reservados.
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Proveedores - Sistema CAE</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Título de página -->
+        <h2 class="page-title"><i class="bi bi-building"></i> Gestión de Proveedores</h2>
+        <p class="page-subtitle">Administra los proveedores del sistema CAE</p>
+        
+        <!-- Tarjetas de estadísticas rápidas -->
+        <div class="stat-grid">
+            <div class="stat-card tone-primary">
+                <div class="stat-icon"><i class="bi bi-building"></i></div>
+                <div class="stat-label">Total Proveedores</div>
+                <div class="stat-value" th:text="${#lists.size(proveedores)}">0</div>
+            </div>
+            <div class="stat-card tone-success">
+                <div class="stat-icon"><i class="bi bi-telephone"></i></div>
+                <div class="stat-label">Con Teléfono</div>
+                <div class="stat-value" th:text="${#lists.size(proveedores.?[telefono != null and telefono != ''])}">0</div>
+            </div>
+            <div class="stat-card tone-info">
+                <div class="stat-icon"><i class="bi bi-envelope"></i></div>
+                <div class="stat-label">Con Email</div>
+                <div class="stat-value" th:text="${#lists.size(proveedores.?[email != null and email != ''])}">0</div>
+            </div>
+            <div class="stat-card tone-warning">
+                <div class="stat-icon"><i class="bi bi-geo-alt"></i></div>
+                <div class="stat-label">Con Dirección</div>
+                <div class="stat-value" th:text="${#lists.size(proveedores.?[direccion != null and direccion != ''])}">0</div>
+            </div>
+        </div>
+        
+        <!-- Panel principal -->
+        <div class="panel">
+            <div class="panel-head tone-primary">
+                <i class="bi bi-list-ul"></i>
+                <span>Listado de Proveedores</span>
+                <a href="/proveedores/nuevo" class="btn-cae ms-auto">
+                    <i class="bi bi-plus-circle"></i> Nuevo Proveedor
+                </a>
+            </div>
+            <div class="panel-body">
+                <!-- Barra de búsqueda -->
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" id="buscarProveedor" class="form-control" 
+                               placeholder="Buscar por nombre, RUC o email...">
+                    </div>
+                </div>
+                
+                <!-- Tabla de proveedores -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="tablaProveedores">
+                        <thead>
+                            <tr>
+                                <th><i class="bi bi-building me-1"></i>Nombre</th>
+                                <th><i class="bi bi-file-earmark-text me-1"></i>RUC</th>
+                                <th><i class="bi bi-telephone me-1"></i>Teléfono</th>
+                                <th><i class="bi bi-envelope me-1"></i>Email</th>
+                                <th><i class="bi bi-geo-alt me-1"></i>Dirección</th>
+                                <th class="text-center"><i class="bi bi-gear me-1"></i>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${proveedores}">
+                                <td>
+                                    <strong th:text="${p.nombre}">Proveedor</strong>
+                                </td>
+                                <td>
+                                    <code class="text-primary fw-bold" th:text="${p.ruc}">20123456789</code>
+                                </td>
+                                <td>
+                                    <span th:if="${p.telefono != null and p.telefono != ''}">
+                                        <i class="bi bi-telephone text-success me-1"></i>
+                                        <span th:text="${p.telefono}">987654321</span>
+                                    </span>
+                                    <span th:unless="${p.telefono != null and p.telefono != ''}" class="text-muted">
+                                        <i class="bi bi-dash"></i>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span th:if="${p.email != null and p.email != ''}">
+                                        <i class="bi bi-envelope text-info me-1"></i>
+                                        <a th:href="'mailto:' + ${p.email}" th:text="${p.email}" class="text-decoration-none">
+                                            email@ejemplo.com
+                                        </a>
+                                    </span>
+                                    <span th:unless="${p.email != null and p.email != ''}" class="text-muted">
+                                        <i class="bi bi-dash"></i>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span th:if="${p.direccion != null and p.direccion != ''}" th:text="${p.direccion}">
+                                        Dirección
+                                    </span>
+                                    <span th:unless="${p.direccion != null and p.direccion != ''}" class="text-muted">
+                                        <i class="bi bi-dash"></i>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <a th:href="@{/proveedores/editar/{id}(id=${p.id})}" 
+                                           class="btn btn-outline-primary" 
+                                           title="Editar proveedor"
+                                           data-bs-toggle="tooltip">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <form th:action="@{/proveedores/eliminar/{id}(id=${p.id})}" 
+                                              method="post" class="d-inline" 
+                                              onsubmit="return confirm('¿Estás seguro de eliminar este proveedor?')">
+                                            <button type="submit" class="btn btn-outline-danger" title="Eliminar proveedor">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(proveedores)}">
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                                    <p class="mt-2 mb-0">No hay proveedores registrados</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-note">
+            <i class="bi bi-info-circle me-1"></i>
+            Los proveedores con información incompleta pueden ser editados para completar sus datos
+        </div>
+    </div>
+    
+    <script>
+        // Búsqueda en tabla
+        document.getElementById('buscarProveedor').addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#tablaProveedores tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

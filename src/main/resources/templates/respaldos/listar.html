@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Gestión de Respaldo - Sistema CAE</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Título de página -->
+        <h2 class="page-title"><i class="bi bi-cloud-arrow-down"></i> Gestión de Respaldos</h2>
+        <p class="page-subtitle">Administra los respaldos de seguridad del sistema</p>
+        
+        <!-- Tarjetas de estadísticas rápidas -->
+        <div class="stat-grid">
+            <div class="stat-card tone-primary">
+                <div class="stat-icon"><i class="bi bi-cloud-check"></i></div>
+                <div class="stat-label">Total Respaldos</div>
+                <div class="stat-value" th:text="${#lists.size(respaldos)}">0</div>
+            </div>
+            <div class="stat-card tone-success">
+                <div class="stat-icon"><i class="bi bi-hdd"></i></div>
+                <div class="stat-label">Espacio Total</div>
+                <div class="stat-value">
+                    <span th:if="${#lists.size(respaldos) > 0}">
+                        <span th:text="${#aggregates.sum(respaldos.![tamano]) > 1048576 ? 
+                            (#aggregates.sum(respaldos.![tamano]) / 1048576) + ' MB' : 
+                            (#aggregates.sum(respaldos.![tamano]) / 1024) + ' KB'}">0 KB</span>
+                    </span>
+                    <span th:if="${#lists.size(respaldos) == 0}">0 KB</span>
+                </div>
+            </div>
+            <div class="stat-card tone-info">
+                <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+                <div class="stat-label">Más Reciente</div>
+                <div class="stat-value" style="font-size: 1.3rem;" th:if="${#lists.size(respaldos) > 0}">
+                    <span th:text="${#temporals.format(respaldos[0].fecha, 'dd/MM/yyyy')}">--</span>
+                </div>
+                <div class="stat-value" style="font-size: 1.3rem;" th:if="${#lists.size(respaldos) == 0}">--</div>
+            </div>
+            <div class="stat-card tone-warning">
+                <div class="stat-icon"><i class="bi bi-shield-check"></i></div>
+                <div class="stat-label">Estado</div>
+                <div class="stat-value" style="font-size: 1.3rem; color: var(--success);">
+                    <i class="bi bi-check-circle"></i> Seguro
+                </div>
+            </div>
+        </div>
+        
+        <!-- Panel principal -->
+        <div class="panel">
+            <div class="panel-head tone-primary">
+                <i class="bi bi-list-ul"></i>
+                <span>Listado de Respaldos</span>
+                <form th:action="@{/respaldos/generar}" method="post" class="d-inline ms-auto">
+                    <button type="submit" class="btn btn-sm btn-light">
+                        <i class="bi bi-download me-1"></i>Generar Respaldo Manual
+                    </button>
+                </form>
+            </div>
+            <div class="panel-body">
+                <!-- Estado vacío -->
+                <div th:if="${#lists.isEmpty(respaldos)}" class="text-center py-5">
+                    <i class="bi bi-cloud-slash text-muted" style="font-size: 4rem;"></i>
+                    <h5 class="text-muted mt-3">No hay respaldos generados</h5>
+                    <p class="text-muted mb-3">Genera un nuevo respaldo haciendo clic en el botón superior.</p>
+                    <form th:action="@{/respaldos/generar}" method="post" class="d-inline">
+                        <button type="submit" class="btn-cae">
+                            <i class="bi bi-download me-1"></i>Generar Primer Respaldo
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Tabla de respaldos -->
+                <div th:unless="${#lists.isEmpty(respaldos)}" class="table-responsive">
+                    <table class="table table-hover align-middle" id="tablaRespaldos">
+                        <thead>
+                            <tr>
+                                <th><i class="bi bi-calendar3 me-1"></i>Fecha</th>
+                                <th class="text-center"><i class="bi bi-tag me-1"></i>Tipo</th>
+                                <th class="text-center"><i class="bi bi-activity me-1"></i>Estado</th>
+                                <th class="text-center"><i class="bi bi-hdd me-1"></i>Tamaño</th>
+                                <th><i class="bi bi-file-earmark-zip me-1"></i>Archivo</th>
+                                <th class="text-center"><i class="bi bi-gear me-1"></i>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="respaldo : ${respaldos}">
+                                <td>
+                                    <small class="text-muted d-block">
+                                        <i class="bi bi-clock me-1"></i>
+                                        <span th:text="${#temporals.format(respaldo.fecha, 'dd/MM/yyyy')}">02/07/2026</span>
+                                    </small>
+                                    <strong th:text="${#temporals.format(respaldo.fecha, 'HH:mm')}">16:29</strong>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge rounded-pill"
+                                          th:classappend="${respaldo.tipo == 'Manual'} ? 'bg-info' : 'bg-secondary'"
+                                          th:text="${respaldo.tipo}">Manual</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge rounded-pill bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        <span th:text="${respaldo.estado}">Completado</span>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="bi bi-file-earmark me-1"></i>
+                                        <span th:if="${respaldo.tamano > 1048576}" 
+                                              th:text="${(respaldo.tamano / 1048576) + ' MB'}">0 MB</span>
+                                        <span th:if="${respaldo.tamano > 1024 and respaldo.tamano <= 1048576}" 
+                                              th:text="${(respaldo.tamano / 1024) + ' KB'}">0 KB</span>
+                                        <span th:if="${respaldo.tamano <= 1024}" 
+                                              th:text="${respaldo.tamano + ' bytes'}">0 bytes</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <code class="text-primary" th:text="${respaldo.nombre}">
+                                        respaldo_20260702_163346.json
+                                    </code>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <a th:href="@{/respaldos/descargar/{nombre}(nombre=${respaldo.nombre})}" 
+                                           class="btn btn-outline-success" 
+                                           title="Descargar respaldo"
+                                           data-bs-toggle="tooltip">
+                                            <i class="bi bi-download"></i>
+                                        </a>
+                                        
+                                        <form th:action="@{/respaldos/eliminar/{nombre}(nombre=${respaldo.nombre})}" 
+                                              method="post" class="d-inline"
+                                              onsubmit="return confirm('¿Estás seguro de eliminar este respaldo? Esta acción no se puede deshacer.')">
+                                            <button type="submit" class="btn btn-outline-danger" 
+                                                    title="Eliminar respaldo"
+                                                    data-bs-toggle="tooltip">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Panel informativo -->
+        <div class="panel mt-3">
+            <div class="panel-body">
+                <h6 class="text-uppercase text-muted small fw-bold mb-3">
+                    <i class="bi bi-info-circle me-1"></i>Información sobre los Respaldos
+                </h6>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="bi bi-shield-check text-success" style="font-size: 1.3rem;"></i>
+                            <div>
+                                <strong class="d-block">Datos Seguros</strong>
+                                <small class="text-muted">Los respaldos incluyen todos los datos del sistema</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="bi bi-clock-history text-primary" style="font-size: 1.3rem;"></i>
+                            <div>
+                                <strong class="d-block">Formato JSON</strong>
+                                <small class="text-muted">Archivos en formato legible y compatible</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="bi bi-arrow-repeat text-warning" style="font-size: 1.3rem;"></i>
+                            <div>
+                                <strong class="d-block">Descarga Fácil</strong>
+                                <small class="text-muted">Descarga los respaldos cuando los necesites</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-note">
+            <i class="bi bi-shield-lock me-1"></i>
+            Se recomienda generar respaldos periódicamente para mantener la seguridad de los datos
+        </div>
+    </div>
+</body>
+</html>

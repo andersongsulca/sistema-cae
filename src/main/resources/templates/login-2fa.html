@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de Dos Pasos - Sistema CAE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: url('/imagen/fondo.png') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 0;
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 1;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 480px;
+            padding: 40px;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .logo-wrapper img {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            padding: 8px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 3px solid #2d5a4a;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            color: #1a1a1a;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .alert-error {
+            background: #fee;
+            border-left: 4px solid #dc3545;
+            color: #c0392b;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .info-box {
+            background: #f0f7f4;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 28px;
+            border: 1px solid #d4e8e0;
+        }
+
+        .info-box p {
+            font-size: 14px;
+            color: #444;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .info-box strong {
+            color: #2d5a4a;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #1a1a1a;
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+
+        .code-input {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 26px;
+            letter-spacing: 10px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #1a1a1a;
+            background: #fafafa;
+        }
+
+        .code-input:focus {
+            border-color: #2d5a4a;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(45, 90, 74, 0.1);
+        }
+
+        .code-input::placeholder {
+            color: #bbb;
+            letter-spacing: 10px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: #2d5a4a;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary:hover {
+            background: #1f4035;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(45, 90, 74, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .cancel-link {
+            display: block;
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .cancel-link:hover {
+            color: #2d5a4a;
+        }
+
+        .cancel-link strong {
+            color: #2d5a4a;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 24px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .code-input {
+                font-size: 22px;
+                letter-spacing: 8px;
+            }
+
+            .logo-wrapper img {
+                width: 75px;
+                height: 75px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-wrapper">
+            <img th:src="@{/imagen/logo.png}" alt="Logo Sistema CAE" />
+        </div>
+
+        <div class="header">
+            <h1>Verificación de Dos Pasos</h1>
+            <p>Confirma tu identidad para acceder al sistema</p>
+        </div>
+
+        <!-- Mensaje de error si el código fue incorrecto -->
+        <div th:if="${error}" class="alert-error">
+            <span th:text="${error}"></span>
+        </div>
+
+        <div class="info-box">
+            <p>
+                Abre tu aplicación autenticadora e ingresa el código de <strong>6 dígitos</strong> correspondiente a <strong>SistemaCAE</strong>.
+            </p>
+        </div>
+
+        <form th:action="@{/verificar-2fa}" method="post">
+            <div class="form-group">
+                <label for="codigo">Código de verificación</label>
+                <input type="number" 
+                       id="codigo"
+                       name="codigo" 
+                       class="code-input" 
+                       required 
+                       pattern="\d{6}" 
+                       maxlength="6" 
+                       placeholder="000000" 
+                       autocomplete="one-time-code" 
+                       autofocus />
+            </div>
+            
+            <button type="submit" class="btn-primary">
+                Verificar e Ingresar
+            </button>
+        </form>
+        
+		<a th:href="@{/cancelar-2fa}" class="cancel-link">
+		    ¿Necesitas ayuda? <strong>Volver al inicio de sesión</strong>
+		</a>
+    </div>
+</body>
+</html>

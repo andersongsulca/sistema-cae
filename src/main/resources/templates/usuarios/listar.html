@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Usuarios - Sistema CAE</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Título de página -->
+        <h2 class="page-title"><i class="bi bi-people"></i> Gestión de Usuarios</h2>
+        <p class="page-subtitle">Administra los usuarios del sistema CAE</p>
+        
+        <!-- Tarjetas de estadísticas rápidas -->
+        <div class="stat-grid">
+            <div class="stat-card tone-primary">
+                <div class="stat-icon"><i class="bi bi-people"></i></div>
+                <div class="stat-label">Total Usuarios</div>
+                <div class="stat-value" th:text="${#lists.size(usuarios)}">0</div>
+            </div>
+            <div class="stat-card tone-success">
+                <div class="stat-icon"><i class="bi bi-person-check"></i></div>
+                <div class="stat-label">Activos</div>
+                <div class="stat-value" th:text="${#lists.size(usuarios.?[activo == true])}">0</div>
+            </div>
+            <div class="stat-card tone-danger">
+                <div class="stat-icon"><i class="bi bi-person-x"></i></div>
+                <div class="stat-label">Inactivos</div>
+                <div class="stat-value" th:text="${#lists.size(usuarios.?[activo == false])}">0</div>
+            </div>
+            <div class="stat-card tone-info">
+                <div class="stat-icon"><i class="bi bi-shield-check"></i></div>
+                <div class="stat-label">Directores</div>
+                <div class="stat-value" th:text="${#lists.size(usuarios.?[rol.name() == 'DIRECTOR'])}">0</div>
+            </div>
+        </div>
+        
+        <!-- Panel principal -->
+        <div class="panel">
+            <div class="panel-head tone-primary">
+                <i class="bi bi-list-ul"></i>
+                <span>Listado de Usuarios</span>
+                <a href="/usuarios/nuevo" class="btn-cae ms-auto">
+                    <i class="bi bi-person-plus"></i> Nuevo Usuario
+                </a>
+            </div>
+            <div class="panel-body">
+                <!-- Barra de búsqueda -->
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" id="buscarUsuario" class="form-control" 
+                               placeholder="Buscar por usuario, nombre o email...">
+                    </div>
+                </div>
+                
+                <!-- Tabla de usuarios -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="tablaUsuarios">
+                        <thead>
+                            <tr>
+                                <th><i class="bi bi-person-badge me-1"></i>Usuario</th>
+                                <th><i class="bi bi-person me-1"></i>Nombre Completo</th>
+                                <th><i class="bi bi-envelope me-1"></i>Email</th>
+                                <th class="text-center"><i class="bi bi-shield me-1"></i>Rol</th>
+                                <th class="text-center"><i class="bi bi-activity me-1"></i>Estado</th>
+                                <th class="text-center"><i class="bi bi-gear me-1"></i>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="u : ${usuarios}">
+                                <td>
+                                    <code class="text-primary fw-bold" th:text="${u.username}">usuario</code>
+                                </td>
+                                <td>
+                                    <i class="bi bi-person-circle text-primary me-1"></i>
+                                    <strong th:text="${u.nombre + ' ' + u.apellido}">Nombre Apellido</strong>
+                                </td>
+                                <td>
+                                    <span th:if="${u.email != null and u.email != ''}">
+                                        <i class="bi bi-envelope text-info me-1"></i>
+                                        <a th:href="'mailto:' + ${u.email}" th:text="${u.email}" class="text-decoration-none">
+                                            email@ejemplo.com
+                                        </a>
+                                    </span>
+                                    <span th:unless="${u.email != null and u.email != ''}" class="text-muted">
+                                        <i class="bi bi-dash"></i>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge rounded-pill" 
+                                          th:classappend="${u.rol.name() == 'DIRECTOR' ? 'bg-danger' : 
+                                                         (u.rol.name() == 'ADMIN' ? 'bg-primary' : 
+                                                         (u.rol.name() == 'SECRETARIA' ? 'bg-warning text-dark' : 'bg-info'))}"
+                                          th:text="${u.rol}">ROL</span>
+                                </td>
+                                <td class="text-center">
+                                    <span th:class="${'badge rounded-pill ' + (u.activo ? 'bg-success' : 'bg-secondary')}"
+                                          th:text="${u.activo ? '✓ Activo' : '✗ Inactivo'}">Activo</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <a th:href="@{/usuarios/editar/{id}(id=${u.id})}" 
+                                           class="btn btn-outline-primary" 
+                                           title="Editar usuario"
+                                           data-bs-toggle="tooltip">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <form th:action="@{/usuarios/eliminar/{id}(id=${u.id})}" 
+                                              method="post" class="d-inline" 
+                                              onsubmit="return confirm('¿Estás seguro de eliminar este usuario?')">
+                                            <button type="submit" class="btn btn-outline-danger" title="Eliminar usuario">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(usuarios)}">
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                                    <p class="mt-2 mb-0">No hay usuarios registrados</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-note">
+            <i class="bi bi-info-circle me-1"></i>
+            Los usuarios inactivos no pueden acceder al sistema
+        </div>
+    </div>
+    
+    <script>
+        // Búsqueda en tabla
+        document.getElementById('buscarUsuario').addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#tablaUsuarios tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

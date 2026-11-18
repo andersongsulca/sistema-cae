@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Usuario Formulario - Sistema CAE</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Título de página -->
+        <h2 class="page-title">
+            <i class="bi bi-person-badge"></i>
+            <span th:text="${usuario.id != null} ? 'Editar Usuario' : 'Nuevo Usuario'">Usuario</span>
+        </h2>
+        <p class="page-subtitle" th:text="${usuario.id != null} ? 'Modifica los datos del usuario seleccionado' : 'Completa el formulario para registrar un nuevo usuario'">
+            Completa el formulario
+        </p>
+        
+        <!-- Alertas de error/éxito -->
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle me-1"></i>
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <!-- Panel del formulario -->
+        <div class="panel">
+            <div class="panel-head tone-primary">
+                <i class="bi bi-person-plus"></i>
+                <span th:text="${usuario.id != null} ? 'Editar Usuario' : 'Nuevo Usuario'">Usuario</span>
+            </div>
+            <div class="panel-body">
+                <form th:action="${usuario.id != null} ? @{/usuarios/actualizar/{id}(id=${usuario.id})} : @{/usuarios/guardar}" 
+                      th:object="${usuario}" method="post" id="formUsuario">
+                    
+                    <!-- Sección: Información de Cuenta -->
+                    <div class="mb-4">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">
+                            <i class="bi bi-key me-1"></i>Información de Cuenta
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-person-badge me-1 text-primary"></i>Usuario *
+                                </label>
+                                <input type="text" th:field="*{username}" class="form-control" 
+                                       required th:readonly="${usuario.id != null}"
+                                       placeholder="Ej: jgarcia">
+                                <small class="text-muted" th:if="${usuario.id == null}">Nombre de usuario para iniciar sesión</small>
+                                <small class="text-warning" th:if="${usuario.id != null}">
+                                    <i class="bi bi-lock"></i> El usuario no se puede modificar
+                                </small>
+                            </div>
+                            
+                            <!-- ✅ CAMPO DE CONTRASEÑA (solo al crear) -->
+                            <div class="col-md-6" th:if="${usuario.id == null}">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-lock me-1 text-danger"></i>Contraseña *
+                                </label>
+                                <input type="password" name="password" class="form-control" 
+                                       required minlength="6"
+                                       placeholder="Mínimo 6 caracteres">
+                                <small class="text-muted">Mínimo 6 caracteres</small>
+                            </div>
+                            
+                            <!-- ✅ CAMPO DE CONFIRMACIÓN DE CONTRASEÑA (solo al crear) -->
+                            <div class="col-md-6" th:if="${usuario.id == null}">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-lock-fill me-1 text-danger"></i>Confirmar Contraseña *
+                                </label>
+                                <input type="password" name="passwordConfirm" class="form-control" 
+                                       required minlength="6"
+                                       placeholder="Repite la contraseña">
+                                <small class="text-muted">Debe coincidir con la contraseña</small>
+                            </div>
+                            
+                            <!-- ✅ CAMPO DE NUEVA CONTRASEÑA (solo al editar) -->
+                            <div class="col-md-6" th:if="${usuario.id != null}">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-lock me-1 text-danger"></i>Nueva Contraseña
+                                </label>
+                                <input type="password" name="password" class="form-control" 
+                                       minlength="6"
+                                       placeholder="Dejar vacío para mantener la actual">
+                                <small class="text-muted">Opcional - Solo si deseas cambiarla</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <!-- Sección: Información Personal -->
+                    <div class="mb-4">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">
+                            <i class="bi bi-person me-1"></i>Información Personal
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-person me-1 text-primary"></i>Nombre *
+                                </label>
+                                <input type="text" th:field="*{nombre}" class="form-control" 
+                                       required placeholder="Ej: Juan">
+                                <small class="text-muted">Nombre del usuario</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-person me-1 text-primary"></i>Apellido *
+                                </label>
+                                <input type="text" th:field="*{apellido}" class="form-control" 
+                                       required placeholder="Ej: García">
+                                <small class="text-muted">Apellido del usuario</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-envelope me-1 text-info"></i>Email
+                                </label>
+                                <input type="email" th:field="*{email}" class="form-control"
+                                       placeholder="usuario@ejemplo.com">
+                                <small class="text-muted">Correo electrónico (opcional)</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-telephone me-1 text-success"></i>Teléfono
+                                </label>
+                                <input type="text" th:field="*{telefono}" class="form-control"
+                                       placeholder="Ej: 987654321">
+                                <small class="text-muted">Número de contacto (opcional)</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <!-- Sección: Rol y Estado -->
+                    <div class="mb-4">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">
+                            <i class="bi bi-shield me-1"></i>Rol y Estado
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-shield-check me-1 text-warning"></i>Rol *
+                                </label>
+                                <select th:field="*{rol}" class="form-select" required>
+                                    <option value="">Seleccionar rol...</option>
+                                    <option th:each="r : ${roles}" th:value="${r}" th:text="${r}">ROL</option>
+                                </select>
+                                <small class="text-muted">Rol determina los permisos del usuario</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-activity me-1 text-success"></i>Estado
+                                </label>
+                                <select th:field="*{activo}" class="form-select">
+                                    <option value="true">✓ Activo - Puede acceder al sistema</option>
+                                    <option value="false"> Inactivo - No puede acceder</option>
+                                </select>
+                                <small class="text-muted">Estado del usuario en el sistema</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botones de acción -->
+                    <div class="d-flex gap-2 pt-3 border-top">
+                        <button type="submit" class="btn-cae">
+                            <i class="bi bi-save"></i>
+                            <span th:text="${usuario.id != null} ? 'Actualizar' : 'Guardar'">Guardar</span>
+                        </button>
+                        <a href="/usuarios" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="footer-note">
+            <i class="bi bi-info-circle me-1"></i>
+            Los campos marcados con * son obligatorios
+        </div>
+    </div>
+</body>
+</html>

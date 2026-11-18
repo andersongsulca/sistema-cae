@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Mis Solicitudes - Sistema CAE</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Título de página -->
+        <h2 class="page-title"><i class="bi bi-file-earmark-text"></i> Mis Solicitudes</h2>
+        <p class="page-subtitle">Historial de solicitudes enviadas por ti</p>
+        
+        <!-- Tarjetas de estadísticas -->
+        <div class="stat-grid">
+            <div class="stat-card tone-primary">
+                <div class="stat-icon"><i class="bi bi-file-earmark-text"></i></div>
+                <div class="stat-label">Total Enviadas</div>
+                <div class="stat-value" th:text="${#lists.size(solicitudes)}">0</div>
+            </div>
+            <div class="stat-card tone-warning">
+                <div class="stat-icon"><i class="bi bi-clock-history"></i></div>
+                <div class="stat-label">Pendientes</div>
+                <div class="stat-value" th:text="${#lists.size(solicitudes.?[estado.name() == 'PENDIENTE'])}">0</div>
+            </div>
+            <div class="stat-card tone-success">
+                <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+                <div class="stat-label">Aprobadas</div>
+                <div class="stat-value" th:text="${#lists.size(solicitudes.?[estado.name() == 'APROBADA'])}">0</div>
+            </div>
+            <div class="stat-card tone-danger">
+                <div class="stat-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="stat-label">Rechazadas</div>
+                <div class="stat-value" th:text="${#lists.size(solicitudes.?[estado.name() == 'RECHAZADA'])}">0</div>
+            </div>
+        </div>
+        
+        <!-- Panel principal -->
+        <div class="panel">
+            <div class="panel-head tone-primary">
+                <i class="bi bi-list-ul"></i>
+                <span>Mis Solicitudes Enviadas</span>
+                <a href="/solicitudes/nueva" class="btn-cae ms-auto">
+                    <i class="bi bi-plus-circle"></i> Nueva Solicitud
+                </a>
+            </div>
+            <div class="panel-body">
+                <div th:if="${#lists.isEmpty(solicitudes)}" class="text-center py-5">
+                    <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                    <h5 class="text-muted mt-3">No has enviado solicitudes aún</h5>
+                    <p class="text-muted mb-0">Haz clic en "Nueva Solicitud" para crear una</p>
+                </div>
+                
+                <div th:unless="${#lists.isEmpty(solicitudes)}" class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th class="text-center"><i class="bi bi-hash me-1"></i>ID</th>
+                                <th><i class="bi bi-calendar3 me-1"></i>Fecha</th>
+                                <th class="text-center"><i class="bi bi-flag me-1"></i>Prioridad</th>
+                                <th class="text-center"><i class="bi bi-box-seam me-1"></i>Productos</th>
+                                <th class="text-center"><i class="bi bi-activity me-1"></i>Estado</th>
+                                <th><i class="bi bi-card-text me-1"></i>Observaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="solicitud : ${solicitudes}">
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark border" th:text="'#' + ${solicitud.id}">#1</span>
+                                </td>
+                                <td>
+                                    <i class="bi bi-calendar3 text-primary me-1"></i>
+                                    <span th:text="${#temporals.format(solicitud.fechaSolicitud, 'dd/MM/yyyy')}">01/01/2024</span>
+                                </td>
+                                <td class="text-center">
+                                    <span th:class="${'badge rounded-pill ' + 
+                                        (solicitud.prioridad == 'URGENTE' ? 'bg-danger' : 
+                                        (solicitud.prioridad == 'ALTA' ? 'bg-warning text-dark' : 'bg-info'))}"
+                                        th:text="${solicitud.prioridad}">NORMAL</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark border" 
+                                          th:text="${#lists.size(solicitud.detalles)} + ' productos'">0 productos</span>
+                                </td>
+                                <td class="text-center">
+                                    <span th:class="${'badge rounded-pill ' + 
+                                        (solicitud.estado.name() == 'APROBADA' ? 'bg-success' : 
+                                        (solicitud.estado.name() == 'RECHAZADA' ? 'bg-danger' : 
+                                        (solicitud.estado.name() == 'ATENDIDA' ? 'bg-primary' : 'bg-warning text-dark')))}"
+                                        th:text="${solicitud.estado.name()}">PENDIENTE</span>
+                                </td>
+                                <td>
+                                    <span th:text="${solicitud.observaciones ?: '-'}" class="text-muted">-</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-3">
+            <a href="/home" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Volver al Inicio
+            </a>
+        </div>
+    </div>
+</body>
+</html>
